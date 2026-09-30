@@ -60,4 +60,12 @@ qu'il faut fiabiliser** (remarque du demandeur, confirmée par les deux blocages
 Constaté sur le jour n° 26 : plus de jeton → « Regarder une pub » → pub en deux parties fermée automatiquement →
 1 jeton reçu → « Jouer ce mot » → partie ouverte. Le cycle complet fonctionne de bout en bout.
 
-Résultats chiffrés de la série d'archives : voir les commits suivants (section mise à jour après la série de tests).
+## 7. Résultats de la série d'archives (robot, version 2)
+
+| Jour | Mot | Essais du robot | Durée | Remarque |
+|---|---|---|---|---|
+| n° 27 (27/09) | toxine | ≈ 27 (119 au total avec la version 1) | non chronométré | première résolution par le solveur |
+| n° 26 (26/09) | médicament | 58 | 283 s | premier jour joué de bout en bout par le robot, jeton et pub compris |
+
+Cadence observée : environ 16 essais par minute. Les scores de tous les essais sont conservés dans `data/obs.json`
+(non versionné). La série continue sur le jour suivant ; ce tableau est complété à la fin.

@@ -25,7 +25,7 @@ que les **archives**, qui ne comptent ni pour le classement ni pour la série.
 | Mot bonus du jour | album | trouvé à la main, 31 essais |
 | 28 septembre | hélicoptère | trouvé à la main, 33 essais |
 | 27 septembre | toxine | trouvé par le robot |
-| 26 septembre | — | en cours au moment de la rédaction (voir `JOURNAL.md` pour la suite) |
+| 26 septembre | médicament | trouvé par le robot, 58 essais, 4 min 43 s |
 
 Le cycle « plus de jeton → regarder une publicité → recevoir un jeton → jouer » a fonctionné de bout en bout sans
 intervention. Un jour d'archive se joue en quelques minutes.
