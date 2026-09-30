@@ -1,0 +1,13 @@
+# Donnees generees (reconstructibles avec les scripts)
+data/emb.npy
+data/vocab.txt
+data/fr_50k.txt
+data/bot.log
+data/obs.json
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Captures / dumps
+*.png
+u.xml
