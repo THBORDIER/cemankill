@@ -14,6 +14,7 @@ en texte via `adb`, ferme tout seul les publicités et enchaîne les jours d'arc
 | `cemankill/bot.py` | Le bot : pilotage `adb`, lecture d'écran, solveur, fermeture des pubs et des succès |
 | `cemankill/embed.py` | Calcule les embeddings des 40 000 mots (une seule fois, via Ollama) |
 | `cemankill/get_wordlist.py` | Télécharge la liste de mots français par fréquence |
+| `docs/INSTALLATION.md` | **Procédure complète** : JDK, SDK Android, émulateur, Ollama, vecteurs, premier lancement |
 | `docs/ARCHITECTURE.md` | Comment ça marche, pièce par pièce, et ce qui a été vérifié |
 | `docs/REVUE-JEU.md` | Avis sur le jeu : UX, bugs constatés, mesures de fluidité |
 | `docs/JOURNAL.md` | Déroulé chronologique de la session, erreurs comprises |
@@ -22,7 +23,8 @@ en texte via `adb`, ferme tout seul les publicités et enchaîne les jours d'arc
 
 ## Démarrage rapide
 
-Prérequis : Windows, Python 3.12, [Ollama](https://ollama.com), un émulateur Android avec Google Play
+Installation complète de la chaîne (émulateur compris) : [docs/INSTALLATION.md](docs/INSTALLATION.md).
+Résumé, si tout est déjà en place. Prérequis : Windows, Python 3.12, [Ollama](https://ollama.com), un émulateur Android avec Google Play
 (SDK Android + `adb`), l'appli Cemanty installée et connectée à un compte.
 
 ```bash

@@ -101,7 +101,7 @@ class Solver:
     def add(self, i, s):
         self.obs.append((i, s)); self.used.add(i)
         w = self.V[i]
-        for v in {w + "s", w + "x", w + "es", w + "e", w.rstrip("sx"), w[:-2] if w.endswith("es") else w, w[:-1] + "aux" if w.endswith("al") else w}:
+        for v in {w + "s", w + "x", w + "es", w + "e", w.rstrip("sx"), w[:-2] if w.endswith("es") else w, w[:-2] + "aux" if w.endswith("al") else w}:
             j = self.idx.get(v)
             if j is not None:
                 self.used.add(j)
