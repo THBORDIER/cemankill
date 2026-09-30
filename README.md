@@ -7,6 +7,9 @@ en texte via `adb`, ferme tout seul les publicités et enchaîne les jours d'arc
 > Projet de test et d'expérimentation, réalisé le 30/09/2026 à la demande du concepteur de l'appli.
 > Le bot ne joue **que les archives** (hors classement et hors série). Voir [l'éthique](docs/ARCHITECTURE.md#4-périmètre-et-éthique).
 
+**Vous êtes le créateur de l'application ? Commencez par [docs/RAPPORT-CREATEUR.md](docs/RAPPORT-CREATEUR.md)** :
+un résumé sans jargon de ce qui a été fait, constaté et recommandé.
+
 ## Ce que contient le dépôt
 
 | Chemin | Rôle |
@@ -14,6 +17,7 @@ en texte via `adb`, ferme tout seul les publicités et enchaîne les jours d'arc
 | `cemankill/bot.py` | Le bot : pilotage `adb`, lecture d'écran, solveur, fermeture des pubs et des succès |
 | `cemankill/embed.py` | Calcule les embeddings des 40 000 mots (une seule fois, via Ollama) |
 | `cemankill/get_wordlist.py` | Télécharge la liste de mots français par fréquence |
+| `docs/RAPPORT-CREATEUR.md` | **Résumé sans jargon pour le créateur de l'appli** : ce qui a été fait, constats, risques |
 | `docs/INSTALLATION.md` | **Procédure complète** : JDK, SDK Android, émulateur, Ollama, vecteurs, premier lancement |
 | `docs/ARCHITECTURE.md` | Comment ça marche, pièce par pièce, et ce qui a été vérifié |
 | `docs/REVUE-JEU.md` | Avis sur le jeu : UX, bugs constatés, mesures de fluidité |
