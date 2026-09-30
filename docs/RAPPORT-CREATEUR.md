@@ -26,9 +26,13 @@ que les **archives**, qui ne comptent ni pour le classement ni pour la série.
 | 28 septembre | hélicoptère | trouvé à la main, 33 essais |
 | 27 septembre | toxine | trouvé par le robot |
 | 26 septembre | médicament | trouvé par le robot, 58 essais, 4 min 43 s |
+| 25 septembre | violence | trouvé par le robot, 42 essais, 3 min 03 s |
 
 Le cycle « plus de jeton → regarder une publicité → recevoir un jeton → jouer » a fonctionné de bout en bout sans
 intervention. Un jour d'archive se joue en quelques minutes.
+
+**À noter honnêtement** : l'enchaînement de plusieurs jours d'affilée a demandé de corriger cinq pannes de navigation
+(détail dans `JOURNAL.md`, §8) ; la dernière série de deux jours n'était pas terminée au moment de la publication.
 
 ## 3. Ce qui a été constaté dans l'application
 
@@ -82,6 +86,8 @@ faire.
   publicitaire. **Ne faites donc pas tourner ce robot sur une version avec de vraies publicités.**
 - **Le rythme des essais n'est pas limité** côté application (le robot joue environ 16 essais par minute). Si le
   classement ou les duels deviennent un enjeu, une limite de cadence serait à envisager.
+- **Une publicité peut ouvrir un navigateur.** Un appui sur la croix, mal placé, est tombé sur l'annonce et a ouvert
+  Chrome. Une croix plus grande ou mieux séparée du contenu limiterait ce risque pour les joueurs aussi.
 - **Les jetons d'archive** peuvent être obtenus en boucle tant que des publicités de test sont servies ; à
   vérifier sur une version de production.
 

@@ -116,19 +116,25 @@ Conditions : émulateur démarré, Cemanty installée et connectée, écran **d�
 verrouillage).
 
 ```bash
-python cemankill/bot.py --days 1
+python -m cemankill --days 1
 ```
 
 Le bot ouvre l'onglet Historique, prend le premier jour non joué, achète un jeton avec une pub si besoin, joue
 jusqu'à la victoire, puis s'arrête. `data/bot.log` garde la trace ; `data/obs.json` garde tous les scores.
 
+## 10. Vérifier l'installation sans téléphone
+
+```bash
+python -m pytest -q        # 42 tests, moins d'une seconde, n'utilisent ni Android ni Ollama
+```
+
 ## Dépannage
 
 | Symptôme | Cause et remède |
 |---|---|
-| `adb` introuvable | Le bot cherche `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` ; ajuster `ADB` en tête de `bot.py` si le SDK est ailleurs |
+| `adb` introuvable | Le bot cherche `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` ; ajuster `ADB` dans `cemankill/config.py` si le SDK est ailleurs |
 | `no devices/emulators found` | L'émulateur n'a pas fini de démarrer : attendre `sys.boot_completed = 1` |
 | Le bot « tape dans le vide » | L'appli n'est plus sur l'écran attendu (popup, pub). Il s'arrête seul après 25 itérations sans progrès ; relancer avec `--resume` si une partie est ouverte |
-| La croix des pubs n'est pas touchée | Écran différent de 1080×2400 : ajuster `CLOSE_XY` |
+| La croix des pubs n'est pas touchée | Écran différent de 1080×2400 : ajuster `CLOSE_XY` dans `cemankill/config.py` |
 | Mots refusés en boucle | Normal pour quelques mots ; au-delà de 25 refus d'affilée le bot s'arrête |
 | Ne jamais utiliser | `taskkill /IM python.exe` ou équivalent : cibler le processus par son PID |

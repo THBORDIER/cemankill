@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.0 - 2026-09-30
+
+Refactoring en paquet Python et tests unitaires.
+
+- Code decoupe en modules (`config`, `device`, `screen`, `solver`, `text`, `storage`, `game`, `navigation`, `cli`) ;
+  seul `device.py` depend d'adb. Lancement : `python -m cemankill`.
+- 42 tests unitaires (pytest) avec faux appareils : boucle de jeu, mots refuses, succes derriere le clavier, pub apres
+  victoire, navigation avec et sans jeton, solveur sur monde synthetique (cibles retrouvees malgre un modele different).
+- Corrige : apres une victoire en archive le bot cherchait le bouton « Terminer » alors que l'ecran propose « Fermer » ;
+  il restait sur la fenetre de victoire et ne pouvait plus ouvrir le jour suivant. `leave_game()` gere les deux boutons,
+  et la navigation ferme d'elle-meme une fenetre de victoire qui cache l'onglet Historique.
+- Corrige : une pub dont la croix a ete mal touchee peut ouvrir Chrome ; `ensure_app()` ramene Cemanty au premier plan
+  (BACK puis relance) sans jamais interagir avec l'autre appli.
+- Corrige : apres la pub recompensee le jeton est credite avec un delai (« Ton jeton arrive… ») ; `claim_token()` touche
+  « Verifier » jusqu'a ce que « Jouer ce mot » reapparaisse.
+- Corrige : une fenetre restee ouverte (victoire, jeton) cachait les onglets ; `go_to_history()` la ferme, avec retries.
+- Corrige : balayage de liste deterministe (retour en haut puis pas lents), plus de jour saute par inertie.
+- Non valide de bout en bout au moment de la publication : deux jours consecutifs d'affilee apres ces correctifs.
+- Corrige (trouve par un test) : si l'ecran ne donnait jamais de score, le bot epuisait ses mots d'amorce puis
+  plantait avec une exception ; il s'arrete maintenant en expliquant pourquoi.
+
 ## 0.1.0 - 2026-09-30
 
 Premiere version, construite et validee le meme jour sur un emulateur Android 14 (Pixel 7).

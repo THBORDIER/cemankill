@@ -66,6 +66,30 @@ Constaté sur le jour n° 26 : plus de jeton → « Regarder une pub » → pub 
 |---|---|---|---|---|
 | n° 27 (27/09) | toxine | ≈ 27 (119 au total avec la version 1) | non chronométré | première résolution par le solveur |
 | n° 26 (26/09) | médicament | 58 | 283 s | premier jour joué de bout en bout par le robot, jeton et pub compris |
+| n° 59 (25/09) | violence | 42 | 183 s | code refactoré, navigation depuis l'écran de victoire précédent comprise |
+| n° 58 (24/09) | — | en cours | — | lancé quand le dépôt a été poussé ; résultat non relevé |
 
-Cadence observée : environ 16 essais par minute. Les scores de tous les essais sont conservés dans `data/obs.json`
+Cadence observée : environ 16 essais par minute. Le premier essai de bout en bout du code refactoré a résolu le n° 59. Les scores de tous les essais sont conservés dans `data/obs.json`
 (non versionné). La série continue sur le jour suivant ; ce tableau est complété à la fin.
+
+## 8. Enchaîner deux jours d'affilée : quatre pannes de navigation, toutes constatées en réel
+
+Le solveur marche ; c'est le **passage d'un jour au suivant** qui a coûté le plus de temps. Chaque panne a été
+constatée sur l'émulateur, puis corrigée et couverte par un test unitaire.
+
+| # | Symptôme | Cause constatée | Correctif |
+|---|---|---|---|
+| 1 | « Impossible d'ouvrir la prochaine archive » après une victoire | En archive, l'écran de victoire a un bouton **Fermer** (le bot cherchait « Terminer », celui du mot bonus) ; la fenêtre cachait l'onglet Historique | `leave_game()` essaie Terminer, Fermer, Plus tard |
+| 2 | Le jour n° 25 sauté | Un balayage rapide fait défiler une dizaine de jours par inertie | Retour en haut de liste, puis petits pas lents |
+| 3 | L'appli disparaît, Chrome s'affiche | Un tap sur la croix d'une pub est tombé sur l'annonce et a ouvert la page de l'annonceur (Chrome, écran d'accueil). Rien n'a été saisi dans Chrome | `ensure_app()` : si une autre appli est au premier plan, BACK puis relance de Cemanty |
+| 4 | « Ton jeton arrive… Réessaie dans un instant » | Le jeton est crédité avec un délai côté serveur ; un bouton **Vérifier** le valide | `claim_token()` touche Vérifier jusqu'à ce que « Jouer ce mot » réapparaisse |
+| 5 | « Onglet Historique introuvable » au démarrage | Une fenêtre « Ce mot te coûte un jeton » restée ouverte d'un essai précédent cachait les onglets | `go_to_history()` ferme ce qui couvre l'écran (plusieurs tentatives) |
+
+**Ce qui est validé et ce qui ne l'est pas.** Les jours n° 26 et n° 59 ont été joués de bout en bout en réel. Les
+correctifs 4 et 5 ont été codés et testés unitairement (50 tests), puis relancés en réel, mais **la série de deux
+jours d'affilée n'a pas été menée à son terme avant la publication** : à vérifier au prochain lancement.
+
+Autre fait utile : pendant ces essais, Chrome a affiché sur l'émulateur l'écran « Continuer en tant que… » avec un compte
+Google déjà connecté sur l'appareil. Le bot n'y a pas touché et ne doit jamais le faire ; c'est la raison d'être de
+`ensure_app()`. Pour éviter toute exposition, **utiliser un compte Google jetable sur l'émulateur**.
+

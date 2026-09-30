@@ -14,9 +14,9 @@ un résumé sans jargon de ce qui a été fait, constaté et recommandé.
 
 | Chemin | Rôle |
 |---|---|
-| `cemankill/bot.py` | Le bot : pilotage `adb`, lecture d'écran, solveur, fermeture des pubs et des succès |
-| `cemankill/embed.py` | Calcule les embeddings des 40 000 mots (une seule fois, via Ollama) |
-| `cemankill/get_wordlist.py` | Télécharge la liste de mots français par fréquence |
+| `cemankill/` | Le paquet Python, un module par responsabilité (voir ci-dessous) |
+| `tests/` | 42 tests unitaires, sans Android ni Ollama (faux appareils) |
+| `cemankill/embed.py`, `get_wordlist.py` | Scripts à lancer une fois : liste de mots, puis embeddings via Ollama |
 | `docs/RAPPORT-CREATEUR.md` | **Résumé sans jargon pour le créateur de l'appli** : ce qui a été fait, constats, risques |
 | `docs/INSTALLATION.md` | **Procédure complète** : JDK, SDK Android, émulateur, Ollama, vecteurs, premier lancement |
 | `docs/ARCHITECTURE.md` | Comment ça marche, pièce par pièce, et ce qui a été vérifié |
@@ -36,12 +36,35 @@ pip install -r requirements.txt
 ollama pull bge-m3                       # ~1,2 Go, une seule fois
 python cemankill/get_wordlist.py         # liste de mots
 python cemankill/embed.py 40000          # produit data/emb.npy et data/vocab.txt
-python cemankill/bot.py --days 3         # joue les 3 prochains jours d'archive
+python -m cemankill --days 3             # joue les 3 prochains jours d'archive
 ```
 
-Options de `bot.py` : `--days N` (nombre de jours à jouer), `--max-guesses N` (plafond par mot, 250 par défaut),
+Options de `python -m cemankill` : `--days N` (nombre de jours à jouer), `--max-guesses N` (plafond par mot, 250 par défaut),
 `--resume` (une partie est déjà ouverte à l'écran). Journal : `data/bot.log` ; tous les scores observés :
 `data/obs.json`.
+
+## Organisation du code
+
+| Module | Rôle | Dépend d'adb ? |
+|---|---|---|
+| `config.py` | Constantes : chemins, coordonnées, textes à reconnaître | non |
+| `device.py` | `AdbDevice` : taper, balayer, lire l'écran. Seule couche qui parle au système | **oui** |
+| `screen.py` | Analyse de l'arbre d'accessibilité : `Screen`, `GameState` | non |
+| `solver.py` | Choix du prochain mot (régression à noyau) | non |
+| `text.py` | Accents et formes voisines (pluriels) | non |
+| `storage.py` | Enregistrement des scores (`obs.json`), écriture atomique | non |
+| `game.py` | `Player` : jouer un mot, pubs, succès, mots refusés | non (reçoit un appareil) |
+| `navigation.py` | Historique → jour non joué → jeton/pub → partie | non (reçoit un appareil) |
+| `cli.py` | Ligne de commande | oui (assemblage) |
+
+Tout sauf `device.py` se teste avec un faux appareil : c'est ce que font les tests.
+
+## Tests
+
+```bash
+pip install -r requirements.txt
+python -m pytest -q
+```
 
 ## Ce que fait vraiment le solveur
 

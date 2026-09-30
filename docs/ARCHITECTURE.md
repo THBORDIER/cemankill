@@ -23,6 +23,13 @@ vérifié en réel (sur l'émulateur) de ce qui relève d'une hypothèse.
 Aucun LLM n'intervient pendant la partie. Les seuls composants « ML » sont les vecteurs de mots, calculés une
 fois et stockés dans un fichier.
 
+## Découpage du code
+
+`device.py` est la **seule** couche qui parle à Android (`adb`). Tout le reste reçoit un « appareil » en paramètre
+(objet avec `screen()`, `tap()`, `swipe()`, `type_text()`, `key()`) : en production c'est `AdbDevice`, dans les tests
+ce sont de faux appareils (`tests/fakes.py`) qui simulent le jeu, les mots refusés, les succès et les pubs.
+C'est ce qui permet de tester la boucle de jeu et la navigation sans téléphone.
+
 ## 1. Les embeddings (`embed.py`)
 
 Un *embedding* associe à chaque mot une liste de nombres (ici 1024) telle que deux mots de sens proche ont des
@@ -37,7 +44,7 @@ listes proches. Le modèle utilisé est **bge-m3**, servi par **Ollama** en loca
 - Ce n'est **ni une base de données, ni un serveur** : deux fichiers lus en mémoire par numpy. Ils ne sont pas
   versionnés (trop gros, reconstructibles).
 
-## 2. Le solveur (`bot.py`, classe `Solver`)
+## 2. Le solveur (`solver.py`, classe `Solver`)
 
 Le jeu répond à chaque essai par un **score de proximité** avec le mot secret (un pourcentage de similarité
 cosinus, qui peut être négatif). Le jeu utilise son propre modèle, différent de bge-m3 : les valeurs ne sont donc
@@ -65,7 +72,7 @@ Limites connues :
 - L'information « le mot est dans le top 1000 (rang 937/1000) » affichée par le jeu n'est **pas encore
   exploitée** : c'est la piste d'amélioration la plus rentable.
 
-## 3. Le pilotage (`bot.py`, fonctions `adb`, `Screen`, `play_word`)
+## 3. Le pilotage (`device.py`, `screen.py`, `game.py`, `navigation.py`)
 
 | Besoin | Méthode | Vérifié |
 |---|---|---|
@@ -75,7 +82,7 @@ Limites connues :
 | Lire le résultat d'un essai | L'en-tête de la partie affiche le **dernier** mot essayé et son score. | oui |
 | Fermer les pubs plein écran | Détection du texte `Test Ad` / `Learn More` / `Next Ad`, puis tap sur la croix en haut à droite (1037, 207 sur un écran 1080×2400), répété jusqu'à disparition. La croix n'apparaît qu'après 5 à 10 secondes. | oui |
 | Fermer un succès débloqué | Le bouton `Continuer` est **caché par le clavier** : on masque le clavier (`KEYCODE_BACK`), on touche `Continuer`, on redonne le focus au champ. | oui |
-| Enchaîner les archives | Onglet Historique → premier jour « Mot à trouver » → « Jouer ce mot » → si plus de jeton : « Regarder une pub » (pub fermée automatiquement) → re-« Jouer ce mot ». | partiel |
+| Enchaîner les archives | Onglet Historique → premier jour « Mot à trouver » → « Jouer ce mot » → si plus de jeton : « Regarder une pub » (pub fermée automatiquement) → re-« Jouer ce mot ». Après la victoire : « Fermer » (archive) ou « Terminer » (mot bonus). | oui sur des jours isolés ; **l'enchaînement de 2 jours d'affilée n'a pas encore été validé d'un bout à l'autre** (voir JOURNAL §8) |
 | Garde-fous | Plus de 25 itérations sans progrès ⇒ arrêt avec message ; plafond d'essais par mot (`--max-guesses`). | oui |
 
 ### Coordonnées d'écran
