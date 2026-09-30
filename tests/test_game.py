@@ -2,7 +2,7 @@
 import pytest
 
 from cemankill import config
-from cemankill.game import Player
+from cemankill.game import Player, SafetyAbort
 from cemankill.navigation import open_next_archive
 from cemankill.solver import Solver
 from cemankill.storage import ObsStore
@@ -171,15 +171,19 @@ def test_open_next_archive_recovers_from_victory_sheet_hiding_the_tabs():
 
 
 # --- une pub qui ouvre une autre appli ----------------------------------------------------
-def test_ensure_app_returns_with_back_then_relaunches(world, tmp_path):
+def test_ensure_app_returns_immediately_with_back(world, tmp_path):
     vocab, E, score = world
     dev = FakeGameDevice(vocab, score, 5)
     dev.fg = "com.android.chrome"
     backs = []
-    dev.key = lambda name: backs.append(name)                     # BACK ne suffit pas : Chrome reste devant
+    def back(name):
+        backs.append(name)
+        if name == "KEYCODE_BACK":
+            dev.fg = config.APP_PACKAGE
+    dev.key = back
     p = Player(dev, Solver(E, vocab), ObsStore(str(tmp_path / "o.json")), lambda m: None, sleep=lambda s: None)
     assert p.ensure_app() is True
-    assert backs.count("KEYCODE_BACK") == 3 and dev.launched == 1 and dev.fg == config.APP_PACKAGE
+    assert backs == ["KEYCODE_BACK"] and dev.launched == 0 and dev.fg == config.APP_PACKAGE
 
 
 def test_ensure_app_does_nothing_when_app_is_in_front(world, tmp_path):
@@ -187,6 +191,30 @@ def test_ensure_app_does_nothing_when_app_is_in_front(world, tmp_path):
     dev = FakeGameDevice(vocab, score, 5)
     p = Player(dev, Solver(E, vocab), ObsStore(str(tmp_path / "o.json")), lambda m: None, sleep=lambda s: None)
     assert p.ensure_app() is True and dev.launched == 0
+
+
+def test_ensure_app_stops_if_external_page_cannot_be_left(world, tmp_path):
+    vocab, E, score = world
+    dev = FakeGameDevice(vocab, score, 5)
+    dev.fg = "com.android.vending"
+    backs = []
+    dev.key = backs.append
+    p = Player(dev, Solver(E, vocab), ObsStore(str(tmp_path / "o.json")), lambda m: None, sleep=lambda s: None)
+    with pytest.raises(SafetyAbort, match="impossible de quitter"):
+        p.ensure_app()
+    assert backs == ["KEYCODE_BACK"] * 3 and dev.launched == 0
+
+
+def test_ensure_app_stops_without_click_when_foreground_is_unknown(world, tmp_path):
+    vocab, E, score = world
+    dev = FakeGameDevice(vocab, score, 5)
+    dev.fg = ""
+    keys = []
+    dev.key = keys.append
+    p = Player(dev, Solver(E, vocab), ObsStore(str(tmp_path / "o.json")), lambda m: None, sleep=lambda s: None)
+    with pytest.raises(SafetyAbort, match="inconnue"):
+        p.ensure_app()
+    assert keys == [] and dev.launched == 0
 
 
 def test_close_ads_recovers_when_croix_tap_opens_advertiser_page(world, tmp_path):

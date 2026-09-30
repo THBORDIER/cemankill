@@ -6,6 +6,18 @@ from . import config
 from .screen import Screen
 
 
+def foreground_package(activity_dump: str, window_dump: str = "") -> str:
+    """Extrait le paquet réellement au premier plan des sorties dumpsys Android."""
+    activity = re.search(
+        r"(?:topResumedActivity|mResumedActivity)=ActivityRecord\{[^}]*?\bu\d+\s+([\w.]+)/",
+        activity_dump,
+    )
+    if activity:
+        return activity.group(1)
+    window = re.search(r"mCurrentFocus=Window\{[^}]*?\bu\d+\s+([\w.]+)/", window_dump)
+    return window.group(1) if window else ""
+
+
 class AdbDevice:
     def __init__(self, adb: str = config.ADB):
         self.adb = adb
@@ -22,8 +34,11 @@ class AdbDevice:
 
     def foreground(self) -> str:
         """Paquet de l'appli au premier plan ('' si inconnu) : detecte une pub qui a ouvert Chrome ou le Play Store."""
-        m = re.search(r"mCurrentFocus=Window\{\S+ \S+ ([\w.]+)/", self._run("shell", "dumpsys", "window"))
-        return m.group(1) if m else ""
+        activity = self._run("shell", "dumpsys", "activity", "activities")
+        package = foreground_package(activity)
+        if package:
+            return package
+        return foreground_package(activity, self._run("shell", "dumpsys", "window"))
 
     def launch(self, package: str, activity: str) -> None:
         self._run("shell", "am", "start", "-n", f"{package}/{activity}")

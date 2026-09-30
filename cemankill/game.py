@@ -9,6 +9,10 @@ from .storage import ObsStore
 from .text import strip_accents
 
 
+class SafetyAbort(RuntimeError):
+    """Le bot a quitte Cemanty et ne peut plus agir sans risque."""
+
+
 class Player:
     def __init__(self, device, solver: Solver, store: ObsStore, log: Callable[[str], None] = print,
                  sleep: Callable[[float], None] = time.sleep):
@@ -44,27 +48,35 @@ class Player:
 
     # --- publicites et succes -----------------------------------------------------------
     def ensure_app(self) -> bool:
-        """Ramene Cemanty au premier plan si une pub a ouvert autre chose (navigateur, Play Store). On n'interagit jamais avec l'autre appli."""
+        """Quitte immediatement toute page externe et exige le retour dans Cemanty."""
+        package = self.dev.foreground()
+        if package == config.APP_PACKAGE:
+            return True
+        if not package:
+            raise SafetyAbort("application au premier plan inconnue")
         for _ in range(3):
-            if self.dev.foreground() in (config.APP_PACKAGE, ""):
-                return True
-            self.log("  autre appli au premier plan -> retour")
+            self.log(f"!! page externe {package} -> retour immediat")
             self.dev.key("KEYCODE_BACK")
-            self.sleep(1)
-        self.dev.launch(config.APP_PACKAGE, config.APP_ACTIVITY)
-        self.sleep(3)
-        return self.dev.foreground() in (config.APP_PACKAGE, "")
+            self.sleep(0.25)
+            package = self.dev.foreground()
+            if package == config.APP_PACKAGE:
+                return True
+            if not package:
+                raise SafetyAbort("premier plan inconnu apres avoir quitte la page externe")
+        raise SafetyAbort(f"impossible de quitter la page externe {package}")
 
     def close_ads(self, limit: int = 90) -> bool:
         """Touche la croix des pubs jusqu'a ce qu'il n'y ait plus de pub. La croix n'apparait qu'apres 5-10 s."""
         closed = False
         for _ in range(limit):
+            self.ensure_app()
             if not parse_state(self.dev.screen()).ad:
                 return closed
             closed = True
             self.dev.tap(*config.CLOSE_XY)
-            self.sleep(2)
-            self.ensure_app()                          # un tap mal place peut ouvrir la page de l'annonceur
+            self.sleep(0.25)
+            self.ensure_app()                          # quitte aussitot le Store ou le navigateur si le tap a rate la croix
+            self.sleep(1.75)
         self.log(f"!! pub encore ouverte apres {limit} essais")
         return closed
 

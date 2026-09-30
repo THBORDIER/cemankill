@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1 - 2026-09-30
+
+Durcissement de la securite de pilotage (travail de Codex, relu et teste).
+
+- Detection fiable de l'appli au premier plan (`dumpsys activity`, repli sur `dumpsys window`) : `foreground_package()`.
+- `ensure_app()` ne relance plus Cemanty : BACK immediat, verification toutes les 0,25 s ; echec ou premier plan
+  inconnu => `SafetyAbort` et arret propre (`!! arret de securite`), plutot que d'agir a l'aveugle.
+- Apres chaque tap sur la croix d'une pub, contrôle immediat du premier plan.
+- 56 tests (dont 4 sur la lecture du premier plan : Play Store, repli sur la fenetre, sortie illisible).
+
 ## 0.2.0 - 2026-09-30
 
 Refactoring en paquet Python et tests unitaires.
@@ -11,8 +21,9 @@ Refactoring en paquet Python et tests unitaires.
 - Corrige : apres une victoire en archive le bot cherchait le bouton « Terminer » alors que l'ecran propose « Fermer » ;
   il restait sur la fenetre de victoire et ne pouvait plus ouvrir le jour suivant. `leave_game()` gere les deux boutons,
   et la navigation ferme d'elle-meme une fenetre de victoire qui cache l'onglet Historique.
-- Corrige : une pub dont la croix a ete mal touchee peut ouvrir Chrome ; `ensure_app()` ramene Cemanty au premier plan
-  (BACK puis relance) sans jamais interagir avec l'autre appli.
+- Corrige : une pub dont la croix a ete mal touchee peut ouvrir Chrome ; `ensure_app()` quitte aussitot la page externe
+  (BACK) ; si elle ne se ferme pas, ou si le premier plan est inconnu, le bot s'arrete (`SafetyAbort`) sans jamais
+  interagir avec l'autre appli.
 - Corrige : apres la pub recompensee le jeton est credite avec un delai (« Ton jeton arrive… ») ; `claim_token()` touche
   « Verifier » jusqu'a ce que « Jouer ce mot » reapparaisse.
 - Corrige : une fenetre restee ouverte (victoire, jeton) cachait les onglets ; `go_to_history()` la ferme, avec retries.

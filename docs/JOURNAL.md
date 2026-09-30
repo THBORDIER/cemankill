@@ -81,7 +81,7 @@ constatée sur l'émulateur, puis corrigée et couverte par un test unitaire.
 |---|---|---|---|
 | 1 | « Impossible d'ouvrir la prochaine archive » après une victoire | En archive, l'écran de victoire a un bouton **Fermer** (le bot cherchait « Terminer », celui du mot bonus) ; la fenêtre cachait l'onglet Historique | `leave_game()` essaie Terminer, Fermer, Plus tard |
 | 2 | Le jour n° 25 sauté | Un balayage rapide fait défiler une dizaine de jours par inertie | Retour en haut de liste, puis petits pas lents |
-| 3 | L'appli disparaît, Chrome s'affiche | Un tap sur la croix d'une pub est tombé sur l'annonce et a ouvert la page de l'annonceur (Chrome, écran d'accueil). Rien n'a été saisi dans Chrome | `ensure_app()` : si une autre appli est au premier plan, BACK puis relance de Cemanty |
+| 3 | L'appli disparaît, Chrome s'affiche | Un tap sur la croix d'une pub est tombé sur l'annonce et a ouvert la page de l'annonceur (Chrome, écran d'accueil). Rien n'a été saisi dans Chrome | `ensure_app()` : si une autre appli est au premier plan, BACK immédiat ; si elle ne se ferme pas ou si le premier plan est inconnu, le bot **s'arrête** (`SafetyAbort`) sans jamais interagir avec l'autre page |
 | 4 | « Ton jeton arrive… Réessaie dans un instant » | Le jeton est crédité avec un délai côté serveur ; un bouton **Vérifier** le valide | `claim_token()` touche Vérifier jusqu'à ce que « Jouer ce mot » réapparaisse |
 | 5 | « Onglet Historique introuvable » au démarrage | Une fenêtre « Ce mot te coûte un jeton » restée ouverte d'un essai précédent cachait les onglets | `go_to_history()` ferme ce qui couvre l'écran (plusieurs tentatives) |
 
