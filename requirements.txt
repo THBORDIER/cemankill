@@ -1,2 +1,5 @@
 numpy>=1.26
+playwright>=1.51,<2
+Pillow>=10,<13
+pystray>=0.19,<1
 pytest>=8

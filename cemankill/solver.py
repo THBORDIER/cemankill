@@ -30,7 +30,8 @@ class Solver:
 
     def reset(self) -> None:
         self.obs: List[tuple] = []       # (indice du mot, score)
-        self.used: set = set()           # indices deja essayes, refuses ou equivalents
+        # Cemanty refuse les locutions avec tiret (ex. « parle-lui ») : elles ne doivent jamais etre proposees.
+        self.used: set = {i for i, word in enumerate(self.vocab) if "-" in word}
         self._seed_pos = 0
 
     def add(self, i: int, score: float) -> None:

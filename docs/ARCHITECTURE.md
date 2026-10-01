@@ -72,7 +72,7 @@ Limites connues :
 - L'information « le mot est dans le top 1000 (rang 937/1000) » affichée par le jeu n'est **pas encore
   exploitée** : c'est la piste d'amélioration la plus rentable.
 
-## 3. Le pilotage (`device.py`, `screen.py`, `game.py`, `navigation.py`)
+## 3. Le pilotage Android (`device.py`, `screen.py`, `game.py`, `navigation.py`)
 
 | Besoin | Méthode | Vérifié |
 |---|---|---|
@@ -91,10 +91,28 @@ Les actions de pilotage utilisent soit le centre d'un élément trouvé par son 
 coordonnée fixe (seulement pour la croix des pubs, dont le texte n'est pas lisible). L'émulateur est un
 Pixel 7 en 1080×2400 : sur un autre écran, ajuster `CLOSE_XY`.
 
+### Pilote navigateur (`browser_bot/`)
+
+Le second pilote ouvre `cemanty.fr/jouer/` avec Playwright dans un profil Edge dédié. Il peut passer le tutoriel en
+mode invité ou réutiliser un profil dédié que l'utilisateur a lui-même connecté. Il focalise le vrai champ Compose
+créé derrière la couche sémantique Flutter, saisit le mot par frappes et valide avec `Entrée`, puis lit le mot, le
+numéro d'essai et le score dans cette même couche. Le solveur et le format de stockage restent communs au pilote
+Android. L'option `--all-sessions` enchaîne le mot bonus gratuit ; `--archives` parcourt séparément les jours manqués.
+
+Le pilote refuse toute URL autre que la route HTTPS `cemanty.fr/jouer/`, tout marqueur publicitaire connu et toute
+iframe visible. La soumission ne clique sur aucun bouton graphique : une publicité superposée ne peut donc pas
+être confondue avec la flèche d'envoi. Le contexte navigateur est fermé systématiquement en sortie.
+`python -m browser_bot --check --headless` valide le parcours sans envoyer de mot. Pour les archives, le démarrage
+d'une publicité récompensée vise uniquement le bouton Cemanty nommé ; aucun clic n'est envoyé dans son contenu et
+seuls des contrôles de fermeture explicitement nommés sont autorisés. Le 01/10/2026, le parcours jusqu'au jour
+manqué et à la demande de jeton a été vérifié, mais pas le cycle pub → jeton → archive : aucune publicité n'était
+disponible et le compte affichait 0 jeton.
+
 ## 4. Périmètre et éthique
 
-- Le bot ne joue **que les archives** (jours passés, hors classement et hors série). Il ne touche ni au mot du
-  jour, ni aux duels, ni au classement : tricher sur un jeu compétitif n'a pas de sens ici et n'est pas le but.
+- Le pilote Android ne joue **que les archives** (jours passés, hors classement et hors série).
+- Le pilote web utilise soit son profil invité isolé, soit un profil de compte dédié connecté explicitement par
+  l'utilisateur. Il ne saisit aucun identifiant, n'exporte aucun cookie et ne touche ni aux duels ni au classement.
 - L'application testée appartient à un proche de l'auteur, qui a demandé le test. Le dépôt ne contient aucun
   identifiant, aucun compte, aucun jeton.
 - Les publicités rencontrées sont des **annonces de test Google** (étiquette `Test Ad`) : le comportement avec de
@@ -107,5 +125,7 @@ pip install -r requirements.txt
 ollama pull bge-m3
 python cemankill/get_wordlist.py
 python cemankill/embed.py 40000      # ~ quelques minutes, produit data/emb.npy et data/vocab.txt
-python cemankill/bot.py --days 1     # l'émulateur doit tourner, l'appli Cemanty ouverte sur l'historique
+python -m cemankill --days 1         # archives Android
+python -m browser_bot --check        # validation web sans essai
+python -m browser_bot                # mot quotidien web en invité
 ```

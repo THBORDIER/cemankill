@@ -60,6 +60,16 @@ def test_ban_excludes_word_from_proposals():
     assert s.next() != first
 
 
+def test_hyphenated_words_are_never_candidates():
+    vocab = list(config.SEEDS) + ["parle-lui", "arc-en-ciel", "motvalide"]
+    E = np.random.default_rng(0).normal(size=(len(vocab), 8)).astype(np.float32)
+    s = Solver(E, vocab, min_obs=0)
+    assert vocab.index("parle-lui") in s.used
+    assert vocab.index("arc-en-ciel") in s.used
+    s.add(vocab.index("maison"), 10.0)
+    assert s.next() not in {vocab.index("parle-lui"), vocab.index("arc-en-ciel")}
+
+
 def test_reset_forgets_everything():
     vocab, E, _ = make_world()
     s = Solver(E, vocab)

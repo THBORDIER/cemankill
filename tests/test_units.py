@@ -71,6 +71,18 @@ def test_parse_state_before_first_guess_has_no_result():
     assert st.last_word is None and st.last_score is None and not st.finished
 
 
+def test_parse_state_archive_when_close_icon_has_no_accessible_abandon_label():
+    st = parse_state(screen_of("Archive", "Mot n° 57 du 23 septembre 2026", "plante", "essai 1", "29,62",
+                               edit="Tape ton prochain mot…"))
+    assert (st.day, st.last_word, st.last_score) == ("57", "plante", 29.62)
+    assert st.in_game and not st.finished
+
+
+def test_parse_state_does_not_mistake_daily_game_for_supported_archive():
+    st = parse_state(screen_of("Cemanty · n° 65", "Bien dormi ?", edit="Tape ton premier mot…"))
+    assert not st.in_game and st.finished
+
+
 def test_parse_state_refused_word_leaves_field_dirty():
     st = parse_state(screen_of("Archive", "Abandonner", "Mot n° 61 du 27 septembre 2026", edit="forest"))
     assert st.field_dirty

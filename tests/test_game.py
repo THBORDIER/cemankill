@@ -6,7 +6,7 @@ from cemankill.game import Player, SafetyAbort
 from cemankill.navigation import open_next_archive
 from cemankill.solver import Solver
 from cemankill.storage import ObsStore
-from tests.fakes import FakeGameDevice, ScriptedDevice, make_world
+from tests.fakes import FakeGameDevice, ScriptedDevice, make_world, screen_of
 
 
 @pytest.fixture
@@ -51,6 +51,23 @@ def test_ad_after_victory_is_closed_and_game_reported_finished(world, tmp_path):
     p, dev, _ = make_player(world, tmp_path, target=500, ad_after_win=True)
     n, word = p.play_word(200)
     assert word == dev.vocab[500] and not dev.ad_open
+
+
+def test_transient_history_during_submit_is_not_mistaken_for_victory(world, tmp_path):
+    class Dev(FakeGameDevice):
+        glitch = True
+
+        def screen(self):
+            if self.tried and self.glitch:
+                self.glitch = False
+                return screen_of("Historique")
+            return super().screen()
+
+    vocab, E, score = world
+    dev = Dev(vocab, score, 700)
+    p = Player(dev, Solver(E, vocab), ObsStore(str(tmp_path / "o.json")), lambda m: None, sleep=lambda s: None)
+    n, word = p.play_word(200)
+    assert word == dev.vocab[700] and n > 1
 
 
 def test_gives_up_when_screen_never_shows_progress(world, tmp_path):

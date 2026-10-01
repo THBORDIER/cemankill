@@ -4,6 +4,20 @@ data/vocab.txt
 data/fr_50k.txt
 data/bot.log
 data/obs.json
+data/browser-profile/
+data/account-profile/
+data/browser_bot.log
+data/browser_bot_console.log
+data/browser_bot.pid
+data/android_bot_console.log
+data/android_bot_error.log
+data/cemankill_state.png
+data/archive_probe.png
+data/ad_probe.png
+data/archive_probe_run.log
+data/web_obs.json
+data/web_banned.json
+data/run-*.log
 # Python
 __pycache__/
 *.pyc

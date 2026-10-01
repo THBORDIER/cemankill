@@ -34,7 +34,11 @@ def main(argv=None) -> int:
     try:
         for d in range(args.days):
             player.close_ads()
-            if not (args.resume and d == 0) and not open_next_archive(player):
+            if args.resume and d == 0:
+                if not player.focus_input():
+                    log("!! reprise impossible : champ de saisie d'archive introuvable")
+                    return 1
+            elif not open_next_archive(player):
                 log("!! impossible d'ouvrir la prochaine archive, arret")
                 return 1
             t0 = time.time()

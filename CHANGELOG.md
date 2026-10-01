@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.0 - 2026-10-01
+
+Ajout d'un second pilote pour `https://cemanty.fr/jouer/`.
+
+- Nouveau paquet `browser_bot/`, lance avec `python -m browser_bot`, sans Android ni `adb`.
+- Reutilisation du solveur et des embeddings existants ; profil invite et observations web persistants.
+- Passage automatique du tutoriel, detection du vrai champ Compose/Flutter et lecture du score via la couche semantique.
+- Garde-fou strict : seules les URL HTTPS de `cemanty.fr` sont autorisees ; la session dediee est fermee en sortie.
+- Mode `--check` pour valider le plateau sans envoyer de mot ; Edge installe est utilise par defaut.
+- Validation reelle le 01/10/2026 : `maison` (-6,28), puis `animal` (0,02), lus et persistes par le pilote.
+- Detection explicite de la limite du mode invite observee apres 29 essais ; aucun contournement par profils jetables.
+- Soumission web au clavier sans clic sur la fleche, URL bornee a `/jouer/`, arret sur marqueur publicitaire ou iframe.
+- Prise en charge du mot bonus gratuit avec `--all-sessions`, sans archive, duel, jeton ni publicite.
+- Mode `--watch` : veille sans clic sur le compte a rebours, puis lancement autonome du prochain plateau.
+- Lanceur Windows avec raccourci Bureau et icone de zone de notification pour demarrer, arreter et suivre le bot.
+- Le menu d'affichage utilise le profil Edge Playwright connecte du bot, jamais le navigateur Windows par defaut.
+- Mode `--archives` : selection des jours `A jouer`, acquisition bornee des jetons recompenses et enchainement
+  automatique ; aucune interaction avec le contenu publicitaire et fermeture des seules commandes nommees.
+- Validation reelle sur compte le 01/10/2026 : mot quotidien `perdant` en 29 essais et bonus `photosynthèse` en 26.
+- Débrief factuel de la session dans `docs/DEBRIEF-2026-10-01.md`, avec distinction entre parcours validés et
+  archives bloquées faute de jeton/publicité disponible.
+- 75 tests unitaires passent.
+
 ## 0.2.1 - 2026-09-30
 
 Durcissement de la securite de pilotage (travail de Codex, relu et teste).

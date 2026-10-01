@@ -84,17 +84,18 @@ def parse_score(text: str) -> Optional[float]:
 
 def parse_state(screen: Screen) -> GameState:
     edit = screen.edit_text()
-    in_game = "Abandonner" in screen.texts or edit is not None
+    header_i = next((k for k, t in enumerate(screen.texts) if t.startswith("Mot n")), None)
+    archive_game = screen.has("Archive") and header_i is not None and edit is not None
+    in_game = "Abandonner" in screen.texts or archive_game
     ad = screen.has_any(config.AD_MARKERS)
     achievement = screen.has_any(config.ACHIEVEMENT_MARKERS)
     day = last_word = last_score = None
-    if "Abandonner" in screen.texts:
-        i = next((k for k, t in enumerate(screen.texts) if t.startswith("Mot n")), None)
-        if i is not None and i + 3 < len(screen.texts):
-            m = re.search(r"n° (\d+)", screen.texts[i])
+    if in_game and header_i is not None:
+        if header_i + 3 < len(screen.texts):
+            m = re.search(r"n° (\d+)", screen.texts[header_i])
             day = m.group(1) if m else None
-            last_word = screen.texts[i + 1]
-            last_score = parse_score(screen.texts[i + 3])
+            last_word = screen.texts[header_i + 1]
+            last_score = parse_score(screen.texts[header_i + 3])
     finished = (screen.has("Terminer") or any(t.startswith("Tu as trouv") for t in screen.texts)
                 or (not in_game and not ad and not achievement))
     return GameState(in_game, edit.text if edit else "", day, last_word, last_score, ad, achievement, finished)

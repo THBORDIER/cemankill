@@ -1,11 +1,12 @@
 # cemankill
 
-Un bot qui joue à **Cemanty** (jeu de mots sémantique quotidien, Android) sur un émulateur, **sans IA générative
-pendant la partie**. Il choisit ses mots avec des vecteurs de mots (embeddings) calculés une fois, lit l'écran
-en texte via `adb`, ferme tout seul les publicités et enchaîne les jours d'archive.
+Un bot qui joue à **Cemanty** (jeu de mots sémantique quotidien), **sans IA générative pendant la partie**.
+Il choisit ses mots avec des vecteurs calculés une fois. Deux pilotes sont disponibles : Android pour les archives,
+et navigateur pour le mot quotidien et son bonus.
 
 > Projet de test et d'expérimentation, réalisé le 30/09/2026 à la demande du concepteur de l'appli.
-> Le bot ne joue **que les archives** (hors classement et hors série). Voir [l'éthique](docs/ARCHITECTURE.md#4-périmètre-et-éthique).
+> Le pilote Android ne joue que les archives. Le pilote web peut utiliser soit son profil invité isolé, soit un
+> profil de compte explicitement connecté par l'utilisateur. Voir [l'éthique](docs/ARCHITECTURE.md#4-périmètre-et-éthique).
 
 **Vous êtes le créateur de l'application ? Commencez par [docs/RAPPORT-CREATEUR.md](docs/RAPPORT-CREATEUR.md)** :
 un résumé sans jargon de ce qui a été fait, constaté et recommandé.
@@ -15,7 +16,8 @@ un résumé sans jargon de ce qui a été fait, constaté et recommandé.
 | Chemin | Rôle |
 |---|---|
 | `cemankill/` | Le paquet Python, un module par responsabilité (voir ci-dessous) |
-| `tests/` | 42 tests unitaires, sans Android ni Ollama (faux appareils) |
+| `browser_bot/` | Le pilote Playwright de `cemanty.fr`, indépendant d'Android et d'`adb` |
+| `tests/` | 75 tests unitaires, sans Android ni Ollama (faux appareils) |
 | `cemankill/embed.py`, `get_wordlist.py` | Scripts à lancer une fois : liste de mots, puis embeddings via Ollama |
 | `docs/RAPPORT-CREATEUR.md` | **Résumé sans jargon pour le créateur de l'appli** : ce qui a été fait, constats, risques |
 | `docs/INSTALLATION.md` | **Procédure complète** : JDK, SDK Android, émulateur, Ollama, vecteurs, premier lancement |
@@ -27,9 +29,9 @@ un résumé sans jargon de ce qui a été fait, constaté et recommandé.
 
 ## Démarrage rapide
 
-Installation complète de la chaîne (émulateur compris) : [docs/INSTALLATION.md](docs/INSTALLATION.md).
-Résumé, si tout est déjà en place. Prérequis : Windows, Python 3.12, [Ollama](https://ollama.com), un émulateur Android avec Google Play
-(SDK Android + `adb`), l'appli Cemanty installée et connectée à un compte.
+Installation complète de la chaîne Android : [docs/INSTALLATION.md](docs/INSTALLATION.md).
+Les deux pilotes utilisent Python 3.12, [Ollama](https://ollama.com) et les mêmes embeddings. Android demande le
+SDK, `adb`, un émulateur Google Play et un compte Cemanty ; le pilote web demande seulement Edge ou Chrome.
 
 ```bash
 pip install -r requirements.txt
@@ -37,11 +39,21 @@ ollama pull bge-m3                       # ~1,2 Go, une seule fois
 python cemankill/get_wordlist.py         # liste de mots
 python cemankill/embed.py 40000          # produit data/emb.npy et data/vocab.txt
 python -m cemankill --days 3             # joue les 3 prochains jours d'archive
+python -m browser_bot --check --headless # verifie la version web sans jouer
+python -m browser_bot                    # joue le mot quotidien dans Edge
+python -m browser_bot --all-sessions     # joue aussi le bonus gratuit
 ```
 
 Options de `python -m cemankill` : `--days N` (nombre de jours à jouer), `--max-guesses N` (plafond par mot, 250 par défaut),
 `--resume` (une partie est déjà ouverte à l'écran). Journal : `data/bot.log` ; tous les scores observés :
 `data/obs.json`.
+
+Le pilote web utilise par défaut un profil invité dédié dans `data/browser-profile`. Le lanceur Windows utilise
+le profil séparé `data/account-profile`, que l'utilisateur connecte lui-même. Voir
+[`browser_bot/README.md`](browser_bot/README.md) pour les options et les garde-fous.
+
+Le bilan détaillé de la mise au point et des essais du 1er octobre est dans
+[`docs/DEBRIEF-2026-10-01.md`](docs/DEBRIEF-2026-10-01.md).
 
 ## Organisation du code
 

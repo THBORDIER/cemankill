@@ -123,7 +123,10 @@ class Player:
             self.submit(word)
             state = self.settle()
             if state.finished:
-                return n + 1, word
+                self.sleep(1)
+                state = self.settle()                   # une transition breve peut exposer l'Historique sous la feuille
+                if state.finished:
+                    return n + 1, word
             if state.field_dirty:                      # mot refuse : il reste dans le champ
                 self.clear_field(len(state.field))
                 self.solver.ban(i)

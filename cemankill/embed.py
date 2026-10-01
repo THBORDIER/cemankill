@@ -1,6 +1,6 @@
 """Construit vocab.txt + emb.npy (embeddings bge-m3 via Ollama) depuis fr_50k.txt."""
 import os, re, json, sys, urllib.request, numpy as np
-OK = re.compile(r"^[a-zàâäçéèêëîïôöùûüÿœæ]+(-[a-zàâäçéèêëîïôöùûüÿœæ]+)?$")
+OK = re.compile(r"^[a-zàâäçéèêëîïôöùûüÿœæ]+$")
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 40000
 words = []
